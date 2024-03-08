@@ -12,16 +12,17 @@ wss.on('connection', function connection(ws) {
         message = JSON.parse(message);
         switch (message.event) {
             case 'message': 
-
-            break;
+                broadcastMessage(message)
+                break;
+            case 'connection':
+                broadcastMessage(message)
+                break;
         }
     })
 })
 
-const message = {
-    event: 'message/connection',
-    id: 888,
-    date: '21.01.2021',
-    username: 'Tony',
-    message: 'Привет'
+function broadcastMessage(message) {    //функция для рассылки всем клиентам
+    wss.clients.forEach(client => {
+        client.send(JSON.stringify(message))
+    })
 }
