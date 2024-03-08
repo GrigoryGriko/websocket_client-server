@@ -3,16 +3,27 @@ import React from 'react';
 
 
 function App() {
-  coonst [MessageChannel, setMessages] = useState([]);
-  const [value, setValue] = useState('');
+    const [MessageChannel, setMessages] = useState([]);
+    const [value, setValue] = useState('');
+    const socket = useRef();
 
-    const subcribe = async () => {
-        const eventSource = new EventSource(`http://localhost:4444/connect`)
-        eventSource.onmessage = function (event) {
-            const message = JSON.parse(event.data);
-            setMessages(prev => [message, ...prev]);
-        }
-    }
+    useEffect(() => {
+        socket.current = new WebSocket('ws://localhost:4444')
+
+        socket.current.onopen = () => {
+
+        }   //когда подключение открылось
+        socket.current.onmessage = () => {
+
+        }   //когда получаем сообщение
+        socket.current.onclose = () => {
+            console.info('подключение закрылось')
+        }   //когда подключение закрылось
+        socket.current.onerror = () => {
+            console.error('произошла ошибка')
+        }   //когда появилась ошибка
+    }, [])
+
 
     const sendMessage = async () => {
         await axios.post('http://localhost:4444/new-messages', {
