@@ -20,7 +20,7 @@ function App() {
                 username,
                 id: Date.now()
             }
-            socket.current.send(message)
+            socket.current.send(JSON.stringify(message))
         }   //когда подключение открылось
         socket.current.onmessage = (event) => {
             const message = JSON.parse(event.data)
