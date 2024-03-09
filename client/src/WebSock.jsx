@@ -1,31 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 
 
 
 function App() {
-    const [MessageChannel, setMessages] = useState([]);
+    const [messages, setMessages] = useState([]);
     const [value, setValue] = useState('');
     const socket = useRef();
     const [connected, setConnected] = useState(false);
     const [username, setUsername] = useState('')
 
-    useEffect(() => {
+    function connect() {
         socket.current = new WebSocket('ws://localhost:4444')
 
         socket.current.onopen = () => {
             setConnected(true)
+            const message = {
+                event: 'connection',
+                username,
+                id: Date.now()
+            }
+            socket.current.send(message)
         }   //когда подключение открылось
-        socket.current.onmessage = () => {
-
+        socket.current.onmessage = (event) => {
+            const message = JSON.parse(event.data)
+            setMessages(prev => [message, ...prev])
         }   //когда получаем сообщение
         socket.current.onclose = () => {
             console.info('подключение закрылось')
         }   //когда подключение закрылось
-        socket.current.onerror = () => {
-            console.error('произошла ошибка')
+        socket.current.onerror = (err) => {
+            console.error('произошла ошибка ' + err)
         }   //когда появилась ошибка
-    }, [])
-
+    }
 
     const sendMessage = async () => {
         await axios.post('http://localhost:4444/new-messages', {
@@ -45,7 +52,7 @@ function App() {
                         type="text" 
                         placeholder="Введите ваше имя"
                     />
-                    <button>Войти</button>
+                    <button onClick={connect}>Войти</button>
                 </div>
             </div>
         )
@@ -56,12 +63,21 @@ function App() {
             <div>
                 <div className="form">
                     <input value={value} onChange={e => setValue(e.target.value)} type="text" />
-                    <buttom onClick={sendMessage}>Отправить</buttom>
+                    <button onClick={sendMessage}>Отправить</button>
                 </div>
                 <div className="messages">
                     {messages.map(mess =>
-                        <div className="message" key={mess.id}>
-                            {mess.message}
+                        <div key={mess.id}>
+                            {mess.event === 'connection'
+                                ? 
+                                <div className="connection_message">
+                                    Пользователь {mess.username} подключился
+                                </div>
+                                :
+                                <div className="message">
+                                    {mess.username}. {mess.message}
+                                </div>
+                            }
                         </div>    
                     )}
                 </div>

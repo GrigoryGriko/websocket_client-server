@@ -9,6 +9,7 @@ const wss = new ws.Server({
 
 wss.on('connection', function connection(ws) {
     ws.on('message', function (message) {
+        console.log(message)
         message = JSON.parse(message);
         switch (message.event) {
             case 'message': 
