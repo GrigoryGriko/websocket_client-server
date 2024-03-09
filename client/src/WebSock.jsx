@@ -15,12 +15,14 @@ function App() {
 
         socket.current.onopen = () => {
             setConnected(true)
+            console.log(socket)
             const message = {
                 event: 'connection',
                 username,
                 id: Date.now()
             }
             socket.current.send(JSON.stringify(message))
+            setValue('')
         }   //когда подключение открылось
         socket.current.onmessage = (event) => {
             const message = JSON.parse(event.data)
@@ -35,10 +37,14 @@ function App() {
     }
 
     const sendMessage = async () => {
-        await axios.post('http://localhost:4444/new-messages', {
+        const message = {
+            username,
             message: value,
-            id: Date.now()
-        })
+            id: Date.now(),
+            event: 'message'
+        }
+        socket.current.send(JSON.stringify(message));
+        setValue('')
     }
 
 
