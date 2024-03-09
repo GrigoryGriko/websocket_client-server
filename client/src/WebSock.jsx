@@ -6,12 +6,14 @@ function App() {
     const [MessageChannel, setMessages] = useState([]);
     const [value, setValue] = useState('');
     const socket = useRef();
+    const [connected, setConnected] = useState(false);
+    const [username, setUsername] = useState('')
 
     useEffect(() => {
         socket.current = new WebSocket('ws://localhost:4444')
 
         socket.current.onopen = () => {
-
+            setConnected(true)
         }   //когда подключение открылось
         socket.current.onmessage = () => {
 
@@ -30,6 +32,23 @@ function App() {
             message: value,
             id: Date.now()
         })
+    }
+
+
+    if (!connected) {
+        return (
+            <div className="center">
+                <div className="form">
+                    <input 
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        type="text" 
+                        placeholder="Введите ваше имя"
+                    />
+                    <button>Войти</button>
+                </div>
+            </div>
+        )
     }
 
     return (

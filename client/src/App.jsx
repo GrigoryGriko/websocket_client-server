@@ -1,13 +1,12 @@
 import React from 'react';
+import WebSock  from "./WebSock";
 
 
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        Real-time клиент сервер
-      </header>
+      <WebSock/>
     </div>
   );
 }
